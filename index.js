@@ -37,6 +37,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedHabit, setSelectedHabit] = useState(null);
+  const [showReminderSettings, setShowReminderSettings] = useState(false);
 
   // Determine API base URL based on platform
   const getApiBase = () => {
@@ -159,9 +160,27 @@ const Index = () => {
     setModalVisible(false);
   };
 
+  const handleToggleReminder = async () => {
+    if (!selectedHabit) return;
+    try {
+      const apiBase = getApiBase();
+      const updatedReminder = !selectedHabit.reminder;
+      await axios.put(`${apiBase}/habits/${selectedHabit._id}`, {
+        ...selectedHabit,
+        reminder: updatedReminder,
+      });
+      console.log(`Reminder ${updatedReminder ? 'enabled' : 'disabled'}`);
+      fetchhabits(); // Refresh list
+      setShowReminderSettings(false);
+    } catch (error) {
+      console.error("Error toggling reminder:", error);
+    }
+  };
+
   const openHabitMenu = (habit) => {
     setSelectedHabit(habit);
     setModalVisible(true);
+    setShowReminderSettings(false);
   };
   return (
     <>
@@ -561,6 +580,86 @@ const Index = () => {
                   Skip
                 </Text>
               </Pressable>
+
+              {/* Reminder Settings */}
+              <Pressable
+                onPress={() => setShowReminderSettings(!showReminderSettings)}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingVertical: 15,
+                  paddingHorizontal: 15,
+                  backgroundColor: selectedHabit?.reminder ? "#2D8CFF" : "#95A5A6",
+                  borderRadius: 10,
+                  gap: 12,
+                }}
+              >
+                <MaterialIcons name="notifications" size={24} color="white" />
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: 16,
+                    fontWeight: "500",
+                    flex: 1,
+                  }}
+                >
+                  {selectedHabit?.reminder 
+                    ? `Reminder: ${selectedHabit?.reminderTime || "09:00"}` 
+                    : "Set Reminder"}
+                </Text>
+                <MaterialIcons 
+                  name={showReminderSettings ? "expand-less" : "expand-more"} 
+                  size={24} 
+                  color="white" 
+                />
+              </Pressable>
+
+              {/* Reminder Settings Panel */}
+              {showReminderSettings && (
+                <View
+                  style={{
+                    backgroundColor: "#F7FBFF",
+                    borderRadius: 10,
+                    padding: 15,
+                    marginTop: -8,
+                  }}
+                >
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                    <Text style={{ fontSize: 15, fontWeight: "500" }}>Enable Reminder</Text>
+                    <Pressable
+                      onPress={handleToggleReminder}
+                      style={{
+                        width: 50,
+                        height: 28,
+                        borderRadius: 14,
+                        backgroundColor: selectedHabit?.reminder ? "#27AE60" : "#ddd",
+                        justifyContent: "center",
+                        paddingHorizontal: 2,
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: 12,
+                          backgroundColor: "white",
+                          alignSelf: selectedHabit?.reminder ? "flex-end" : "flex-start",
+                        }}
+                      />
+                    </Pressable>
+                  </View>
+                  {selectedHabit?.reminder && (
+                    <View style={{ marginTop: 10 }}>
+                      <Text style={{ fontSize: 13, color: "#475569", marginTop: 5 }}>
+                        Reminder time: {selectedHabit?.reminderTime || "09:00"}
+                      </Text>
+                      <Text style={{ fontSize: 12, color: "#94A3B8", marginTop: 5 }}>
+                        To change the reminder time, edit the habit.
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              )}
 
               {/* Edit */}
               <Pressable
