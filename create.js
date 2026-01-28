@@ -1,6 +1,8 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import axios from "axios";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
@@ -32,6 +34,8 @@ const Create = () => {
   });
   const [selectedDatesOfMonth, setSelectedDatesOfMonth] = useState({});
   const [reminder, setReminder] = useState(true);
+  const [reminderTime, setReminderTime] = useState(new Date());
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedMonths, setSelectedMonths] = useState({}); // For month selection
   const router = useRouter();
@@ -192,10 +196,11 @@ const Create = () => {
 
     try {
       const habitDetails = {
-        title: title,
+        name: title,
         color: selectedColor,
         repeatMode: habitMode,
         reminder: reminder,
+        reminderTime: `${reminderTime.getHours().toString().padStart(2, '0')}:${reminderTime.getMinutes().toString().padStart(2, '0')}`,
       };
 
       // Add daysOfWeek if in Weekly mode
@@ -800,6 +805,38 @@ const Create = () => {
           </Pressable>
         </View>
 
+        {reminder && (
+          <View style={styles.timePickerContainer}>
+            <Text style={{ fontSize: 15, fontWeight: "500", marginBottom: 10 }}>
+              Reminder Time
+            </Text>
+            <Pressable
+              onPress={() => setShowTimePicker(true)}
+              style={styles.timePickerButton}
+            >
+              <MaterialIcons name="access-time" size={24} color="#2D8CFF" />
+              <Text style={styles.timePickerText}>
+                {reminderTime.getHours().toString().padStart(2, '0')}:
+                {reminderTime.getMinutes().toString().padStart(2, '0')}
+              </Text>
+            </Pressable>
+            {showTimePicker && (
+              <DateTimePicker
+                value={reminderTime}
+                mode="time"
+                is24Hour={true}
+                display={Platform.OS === "ios" ? "spinner" : "default"}
+                onChange={(event, selectedDate) => {
+                  setShowTimePicker(Platform.OS === "ios");
+                  if (selectedDate) {
+                    setReminderTime(selectedDate);
+                  }
+                }}
+              />
+            )}
+          </View>
+        )}
+
         <TouchableOpacity onPress={addHabit} style={styles.saveButton}>
           <Text style={styles.saveButtonText}>
             {habitMode === "Weekly"
@@ -858,6 +895,27 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  timePickerContainer: {
+    marginTop: 15,
+    padding: 15,
+    backgroundColor: "#F7FBFF",
+    borderRadius: 10,
+  },
+  timePickerButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    backgroundColor: "white",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#2D8CFF",
+    gap: 10,
+  },
+  timePickerText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#2D8CFF",
   },
   saveButton: {
     marginTop: 27,

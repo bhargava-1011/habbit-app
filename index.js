@@ -13,6 +13,7 @@ import {
   Text,
   View
 } from "react-native";
+import { scheduleHabitReminder, requestNotificationPermissions } from "./notificationUtils";
 
 // Ocean Breeze palette (selected): clean, fresh — balanced contrast
 const PALETTE = {
@@ -52,7 +53,20 @@ const index = () => {
 
   useEffect(() => {
     fetchhabits();
+    // Request notification permissions on mount
+    requestNotificationPermissions();
   }, []);
+
+  // Schedule notifications when habits are loaded
+  useEffect(() => {
+    if (habits.length > 0) {
+      habits.forEach(habit => {
+        if (habit.reminder && habit.reminderTime) {
+          scheduleHabitReminder(habit);
+        }
+      });
+    }
+  }, [habits]);
 
   const fetchhabits = async () => {
     try {
@@ -360,7 +374,7 @@ const index = () => {
                           fontWeight: "500",
                         }}
                       >
-                        {habit?.repeatMode} • {habit?.reminder ? "🔔" : ""}
+                        {habit?.repeatMode} • {habit?.reminder ? `🔔 ${habit?.reminderTime || "09:00"}` : ""}
                       </Text>
                     </View>
                     <View

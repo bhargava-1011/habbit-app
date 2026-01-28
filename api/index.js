@@ -69,6 +69,10 @@ const habitSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  reminderTime: {
+    type: String,
+    default: "09:00", // Default reminder time
+  },
   completed: {
     type: Object,
     default: {},
@@ -110,7 +114,7 @@ app.get("/habitslist", async (req, res) => {
 // Create a new habit
 app.post("/habits", async (req, res) => {
   try {
-    const { name, color, repeatMode, daysOfWeek, daysOfMonth, reminder } = req.body;
+    const { name, color, repeatMode, daysOfWeek, daysOfMonth, reminder, reminderTime } = req.body;
     
     // Input validation
     if (!name || typeof name !== 'string' || name.trim() === '') {
@@ -132,6 +136,7 @@ app.post("/habits", async (req, res) => {
       daysOfWeek,
       daysOfMonth,
       reminder,
+      reminderTime: reminderTime || "09:00",
     });
 
     await newHabit.save();
@@ -160,11 +165,16 @@ app.get("/habits/:id", async (req, res) => {
 // Update habit (edit)
 app.put("/habits/:id", async (req, res) => {
   try {
-    const { name, color, repeatMode, daysOfWeek, daysOfMonth, reminder } = req.body;
+    const { name, color, repeatMode, daysOfWeek, daysOfMonth, reminder, reminderTime } = req.body;
+    
+    const updateData = { name, color, repeatMode, daysOfWeek, daysOfMonth, reminder };
+    if (reminderTime) {
+      updateData.reminderTime = reminderTime;
+    }
     
     const updatedHabit = await Habit.findByIdAndUpdate(
       req.params.id,
-      { name, color, repeatMode, daysOfWeek, daysOfMonth, reminder },
+      updateData,
       { new: true }
     );
 
