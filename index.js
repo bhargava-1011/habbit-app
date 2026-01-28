@@ -30,7 +30,7 @@ const PALETTE = {
   cardDefault: "#2563EB",
   subtleBg: "#F1F5F9",
 };
-const index = () => {
+const Index = () => {
   const [option, setOption] = useState("Today");
   const router = useRouter();
   const [habits, setHabits] = useState([]);
@@ -647,5 +647,5 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
 const styles = StyleSheet.create({});
