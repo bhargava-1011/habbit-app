@@ -12,19 +12,26 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // MongoDB connection (modern syntax without deprecated options)
-const mongoUrl = process.env.MONGODB_URI || "mongodb+srv://mansingh805:1234@cluster0.vyi8qyq.mongodb.net/habbit-app?retryWrites=true&w=majority";
+const mongoUrl = process.env.MONGODB_URI;
 
-console.log("Connecting to MongoDB (using DB):", mongoUrl.replace(/:[^:@]+@/, ':*****@'));
+if (!mongoUrl) {
+  console.log("⚠️  Warning: MONGODB_URI environment variable not set");
+  console.log("Server will run but database operations will fail");
+} else {
+  console.log("Connecting to MongoDB (using DB):", mongoUrl.replace(/:[^:@]+@/, ':*****@'));
+}
 
-mongoose
-  .connect(mongoUrl)
-  .then(() => {
-    console.log("✓ Connected to MongoDB successfully");
-  })
-  .catch((error) => {
-    console.log("✗ Error connecting to MongoDB:", error.message);
-    console.log("Continuing without DB connection. API will still run but DB operations may fail.");
-  });
+if (mongoUrl) {
+  mongoose
+    .connect(mongoUrl)
+    .then(() => {
+      console.log("✓ Connected to MongoDB successfully");
+    })
+    .catch((error) => {
+      console.log("✗ Error connecting to MongoDB:", error.message);
+      console.log("Continuing without DB connection. API will still run but DB operations may fail.");
+    });
+}
 
 // Habit Schema
 const habitSchema = new mongoose.Schema({
@@ -105,8 +112,21 @@ app.post("/habits", async (req, res) => {
   try {
     const { name, color, repeatMode, daysOfWeek, daysOfMonth, reminder } = req.body;
     
+    // Input validation
+    if (!name || typeof name !== 'string' || name.trim() === '') {
+      return res.status(400).json({ error: "Name is required and must be a non-empty string" });
+    }
+    
+    if (!color || typeof color !== 'string') {
+      return res.status(400).json({ error: "Color is required and must be a string" });
+    }
+    
+    if (repeatMode && !['Daily', 'Weekly', 'Monthly'].includes(repeatMode)) {
+      return res.status(400).json({ error: "RepeatMode must be one of: Daily, Weekly, Monthly" });
+    }
+    
     const newHabit = new Habit({
-      name,
+      name: name.trim(),
       color,
       repeatMode,
       daysOfWeek,
@@ -188,6 +208,11 @@ app.put("/habits/:id/completed/:day", async (req, res) => {
 app.patch("/habits/:id", async (req, res) => {
   try {
     const { archived } = req.body;
+    
+    // Validate that archived is a boolean
+    if (typeof archived !== 'boolean') {
+      return res.status(400).json({ error: "Archived must be a boolean value (true or false)" });
+    }
     
     const updatedHabit = await Habit.findByIdAndUpdate(
       req.params.id,
