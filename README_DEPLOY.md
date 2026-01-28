@@ -19,6 +19,10 @@ I created an automated deployment script. You just need to run:
 ./deploy.sh
 ```
 
+**⚠️ Important:** Must use `./` prefix! Don't run just `deploy.sh` - it won't work!
+
+If you get "command not found", see [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+
 ### 🎯 That's It!
 
 After running the script:
@@ -37,6 +41,23 @@ git checkout main || git checkout -b main
 git merge copilot/run-my-code-task
 git push origin main
 ```
+
+---
+
+## Common Issue: "command not found: deploy.sh"
+
+**Problem:** Running `deploy.sh` without `./` prefix
+
+**Solution:** Use `./deploy.sh` instead:
+```bash
+# ❌ This won't work:
+deploy.sh
+
+# ✅ This works:
+./deploy.sh
+```
+
+See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more help.
 
 ---
 

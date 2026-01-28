@@ -1,5 +1,18 @@
 # ⚡ IMMEDIATE ACTION REQUIRED - Deploy Reminder Feature
 
+## ⚠️ IMPORTANT: Script Execution Note
+
+If you get an error like:
+```
+zsh: command not found: deploy.sh
+```
+
+**Solution:** Use `./deploy.sh` (with the `./` prefix), not just `deploy.sh`
+
+See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for detailed help with all errors.
+
+---
+
 ## 🎯 Current Situation
 
 **Code Status**: ✅ 100% Complete and Ready  
@@ -16,9 +29,25 @@
 I've created a deployment script for you. Just run:
 
 ```bash
-cd /home/runner/work/habbit-app/habbit-app
+cd /path/to/habbit-app
 ./deploy.sh
 ```
+
+**⚠️ IMPORTANT:** You MUST use `./` before `deploy.sh`!
+
+**Common Error:**
+```bash
+# ❌ This won't work:
+deploy.sh
+# Error: zsh: command not found: deploy.sh
+
+# ✅ This works:
+./deploy.sh
+```
+
+**Why?** Unix/macOS require `./` to run scripts from the current directory for security.
+
+See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) if you get errors.
 
 This script will:
 1. ✅ Fetch latest changes
