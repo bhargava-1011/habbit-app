@@ -1,0 +1,7 @@
+{
+  "env": {
+    "EXPO_PUBLIC_API_URL": "@api_url"
+  },
+  "buildCommand": "npm run build || npm run web",
+  "regions": ["iad1"]
+}

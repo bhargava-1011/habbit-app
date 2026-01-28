@@ -1,0 +1,3 @@
+Server is running on http://localhost:3000
+✗ Error connecting to MongoDB: options usenewurlparser, useunifiedtopology are not supported
+Continuing without DB connection. API will still run but DB operations may fail.
